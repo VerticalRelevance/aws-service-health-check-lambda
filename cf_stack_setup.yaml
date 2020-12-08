@@ -1,0 +1,44 @@
+##### Setup for SNS Topic Setup #####
+
+### Platinum Topic
+
+
+### Gold Topic
+
+
+### Silver Topic
+
+
+#############################################################
+
+##### SNS Subscribers #####
+
+
+### Platinum Topic
+
+
+### Gold Topic
+
+
+### Silver Topic
+
+
+#############################################################
+
+##### DynamoDB State Tracking DB Setup #####
+
+
+
+
+
+
+
+
+
+#############################################################
+
+
+
+
+
+##### Lambda Setup #####

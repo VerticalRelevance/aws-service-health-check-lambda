@@ -1,1 +1,4 @@
 /.vscode
+test.py
+clear_dynamodb_table.py
+dynamodb_test.py

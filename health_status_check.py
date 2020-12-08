@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 '''Return the status and remedation of specified AWS Services'''
@@ -19,66 +19,6 @@ logging.info("Input file loaded successfully")
 # Creates boto3 health and sns client needed for script
 health_client = boto3.client('health')
 sns_client = boto3.client('sns')
-
-# Detection Functionality
-
-def detect_service_failures():
-    ### Need to run as root account for this to work
-    #health_response = health_client.describe_events_for_organization()
-
-    # Get recent health events that are open for account lambda resides in
-
-####### PRODUCTION CODE SNIPIT BELOW #######
-    # health_response = health_client.describe_events(filter={
-    #     'regions': [
-    #         (config['default']['region']).strip('"')
-    #         ],
-    #     'eventStatusCodes': [
-    #         'open'
-    #     ],
-    #     }
-    # )
-
-####### NOT PRODUCTION - Pulls ALL Events, not just open events. Replace after testing ########
-    health_response = health_client.describe_events(filter={
-        'regions': [
-            (config['default']['region']).strip('"')
-            ],
-        }
-    )
-
-    logging.info("Successfully checked for failed services")
-
-    # Creating empty list to store possible failed services in
-
-    if len(health_response['events']) == 0:
-        logging.info("There are no current AWS Health Events - EXITING")
-        return
-    else:
-        logging.info("There are AWS health events affecting your account")
-
-        # Creating a dictionary object that stores the differnet service level and failed serivce
-        failure_dict = dict()
-
-        for i, event in enumerate(health_response['events']):
-            # Check platinum specified services for failures
-            if event['service'] in config['default']['platinum_services'].split(","):
-                logging.info((f"{event['service']} is a platinum service and has degraded health"))
-                failure_dict.setdefault("Platinum", []).append(event['service'])
-            # Check gold specified services for failures
-            if event['service'] in config['default']['gold_services'].split(","):
-                logging.info((f"{event['service']} is a gold service and has degraded health"))
-                failure_dict.setdefault("Gold", []).append(event['service'])
-            ## Check silver specified services for failures
-            if event['service'] in config['default']['silver_services'].split(","):
-                logging.info((f"{event['service']} is a silver service and has degraded health"))
-                failure_dict.setdefault("Silver", []).append(event['service'])
-
-
-        logging.info("Successfully returned dictionary with failed services")
-
-        # Returns failed items to a dict that can be passed into notify function
-        return failure_dict
         
 
 
@@ -99,6 +39,14 @@ def notify_service_failures(failure_dicionary):
                         )
 
 notify_service_failures(detect_service_failures())
+
+
+def main():
+    service_failures = detect_service_failures()
+    notify_service_failures(service_failures)
+
+
+#if __name__ == main()
 
 ######################## END NOTIFICATION ######################## 
 
