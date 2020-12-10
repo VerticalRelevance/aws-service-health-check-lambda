@@ -1,44 +1,110 @@
-##### Setup for SNS Topic Setup #####
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Setup for AWS Service Health Check Tool
 
-### Platinum Topic
+Parameters: 
+  DynamoDBTableNameParameter: 
+    Description: Name of state tracking table for AWS Service Health Check Lambda
+    Type: String
+    Default: AWS-Failure-Events-State-Table
+  TagTablePurpose:
+    Description: Purpose tag for table
+    Type: String
+    Default: Table is used to track the state of aws service level failures
+  PlatinumSubscriberList:
+    Description: List of platinum subscribers that will be subscribed to platinum topic
+    Type: CommaDelimitedList
+  GoldSubscriberList:
+    Description: List of gold subscribers that will be subscribed to gold topic
+    Type: CommaDelimitedList
+  SilverSubscriberList:
+    Description: List of silver subscribers that will be subscribed to silver topic
+    Type: CommaDelimitedList
+
+Resources:
+  ##### Setup for SNS Topic Setup #####
+
+  ### Platinum Topic
+
+  PlatinumSnsTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      TopicName: "Platinum-AWS-Service-Health-Check-Topic"
+
+  ### Gold Topic
+
+  GoldSnsTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      TopicName: "Gold-AWS-Service-Health-Check-Topic"
+
+  ### Silver Topic
+
+  SilverSnsTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      TopicName: "Silver-AWS-Service-Health-Check-Topic"
 
 
-### Gold Topic
+  #############################################################
 
-
-### Silver Topic
-
-
-#############################################################
-
-##### SNS Subscribers #####
-
-
-### Platinum Topic
-
-
-### Gold Topic
-
-
-### Silver Topic
-
-
-#############################################################
-
-##### DynamoDB State Tracking DB Setup #####
+  ##### SNS Subscribers #####
 
 
 
 
+  ### Platinum Topic
+
+PlatinumSubscription:
+  Type: AWS::SNS::Subscription
+  Properties:
+    Endpoint: test@example.com
+    Protocol: email
+    TopicArn: !Ref 'MySNSTopic'
+
+
+
+  ### Gold Topic
+
+
+  ### Silver Topic
+
+
+  #############################################################
+
+  ##### DynamoDB State Tracking DB Setup #####
+
+
+
+  AWSFailureEventsStateTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "eventArn"
+          AttributeType: "S"
+        -
+          AttributeName: "service"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "eventArn"
+          KeyType: "HASH"
+        -
+          AttributeName: "service"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: !Ref DynamoDBTableNameParameter
+      Tags:
+        - Key: "Purpose"
+          Value: !Ref TagTablePurpose
+    
+
+  #############################################################
 
 
 
 
 
-#############################################################
-
-
-
-
-
-##### Lambda Setup #####
+  ##### Lambda Setup #####

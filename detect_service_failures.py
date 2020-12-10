@@ -4,8 +4,12 @@
 
 '''Return the status of specified AWS Services'''
 
+
+
 import logging
 import configparser
+
+import json # for testing purposes only to read in test file
 
 import boto3
 
@@ -31,7 +35,13 @@ def get_service_level(service):
 
 # Detection Functionality
 
+
+#### FOR TESTING ONLY - READING IN FILE FOR SAMPLE EVENTS ####
+with open('test_health_events_payload.json') as f:
+  health_response = json.load(f)
+
 def detect_service_failures():
+
     ### Need to run as root account for this to work
     #health_response = health_client.describe_events_for_organization()
 
@@ -49,19 +59,16 @@ def detect_service_failures():
     # )
 
 ####### NOT PRODUCTION - Pulls ALL Events, not just open events. Replace after testing ########
-    health_response = health_client.describe_events(filter={
-        'regions': [
-            (config['default']['region']).strip('"')
-            ],
-        }
-    )
-
-    ##### ADD LOGIC: Add logic that only pulls the last three days of events (Open and closed)
+    # health_response = health_client.describe_events(filter={
+    #     'regions': [
+    #         (config['default']['region']).strip('"')
+    #         ],
+    #     }
+    # )
 
     logging.info("Successfully checked for failed services")
 
     # Creating empty list to store possible failed services in
-
     if len(health_response['events']) == 0:
         logging.info("There are no current AWS Health Events - EXITING")
         return
@@ -93,7 +100,8 @@ def detect_service_failures():
                     event_failure_dict[event['arn']] = event
 
                 logging.info("Successfully returned dictionary with failed services")
-            except TypeError:
+            except TypeError as NotCriticalService:
+                ## Add Info type to logger saying that Service X is not a critical service
                 pass
         # Returns failed items and events to a dict that can be passed into notify function
         return (service_failure_dict, event_failure_dict)
