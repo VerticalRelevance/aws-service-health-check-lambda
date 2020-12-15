@@ -12,7 +12,7 @@ import time
 
 from detect_service_failures import detect_service_failures, get_service_level
 
-# Setting up logging component of lamdba script
+# Setting up logging component of lambda script
 logging.basicConfig(level=logging.DEBUG)
 
 # Creates up config parser object and imports the config file
@@ -31,7 +31,7 @@ def write_service_failure_event(event_failure_dictionary):
     for event in event_failure_dictionary:
         try:
             if event_failure_dictionary[event]['statusCode'] == "open":
-                put_response = dynamno_db_client.put_item(
+                dynamo_put_response = dynamno_db_client.put_item(
                     TableName= config['default']['dynamodb_table_name'],
                     Item={
                         'eventArn': {'S': event_failure_dictionary[event]['arn']},

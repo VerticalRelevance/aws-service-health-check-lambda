@@ -1,79 +1,118 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Setup for AWS Service Health Check Tool
+Description: Setup for AWS Service Health Check Tool - VR Blog Post POC
 
 Parameters: 
   DynamoDBTableNameParameter: 
     Description: Name of state tracking table for AWS Service Health Check Lambda
     Type: String
-    Default: AWS-Failure-Events-State-Table
+    ## For Testing Only ##
+    # Default: AWS-Failure-Events-State-Table
   TagTablePurpose:
     Description: Purpose tag for table
     Type: String
-    Default: Table is used to track the state of aws service level failures
-  PlatinumSubscriberList:
-    Description: List of platinum subscribers that will be subscribed to platinum topic
-    Type: CommaDelimitedList
-  GoldSubscriberList:
-    Description: List of gold subscribers that will be subscribed to gold topic
-    Type: CommaDelimitedList
-  SilverSubscriberList:
-    Description: List of silver subscribers that will be subscribed to silver topic
-    Type: CommaDelimitedList
+    ## For Testing Only ##
+    # Default: Table is used to track the state of AWS service level failures
+  PlatinumSNSTopicID:
+    Description: Name for the platinum SNS topic that will be created for platinum service outages
+    Type: String
+    ## For Testing Only ##
+    # Default: Platinum-AWS-Failure-SNS
+  GoldSNSTopicID:
+    Description: Name for the gold SNS topic that will be created for gold service outages
+    Type: String
+    ## For Testing Only ##
+    # Default: Gold-AWS-Failure-SNS
+  SilverSNSTopicID:
+    Description: Name for the silver SNS topic that will be created for silver service outages
+    Type: String
+    ## For Testing Only ##
+    # Default: Silver-AWS-Failure-SNS
+  PlatinumSubscriberEmail:
+    Description: Email address for platinum subscribers that will be subscribed to platinum topic. (One Only)
+    Type: String
+    ## For Testing Only ##
+    # Default: hsneed@verticalrelevance.com
+  GoldSubscriberEmail:
+    Description: Email address for gold subscribers that will be subscribed to gold topic. (One Only)
+    Type: String
+    ## For Testing Only ##
+    # Default: hsneed@verticalrelevance.com
+  SilverSubscriberEmail:
+    Description: Email address for silver subscribers that will be subscribed to silver topic. (One Only)
+    Type: String
+    ## For Testing Only ##
+    # Default: hsneed@verticalrelevance.com
+
+# Used to change the order that the parameters are presented in
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "DynamoDB Configuration"
+        Parameters:
+          - DynamoDBTableNameParameter
+          - TagTablePurpose
+      -
+        Label:
+          default: "SNS Topic Setup"
+        Parameters:
+          - PlatinumSNSTopicID
+          - GoldSNSTopicID
+          - SilverSNSTopicID
+      -
+        Label:
+          default: "SNS Subscriber Setup"
+        Parameters:
+          - PlatinumSubscriberEmail
+          - GoldSubscriberEmail
+          - SilverSubscriberEmail
+
 
 Resources:
-  ##### Setup for SNS Topic Setup #####
 
-  ### Platinum Topic
+  ##### SNS Topic / Subscriber Setup #####
 
-  PlatinumSnsTopic:
+  PlatinumSubscriptionTopic:
     Type: AWS::SNS::Topic
-    Properties: 
-      TopicName: "Platinum-AWS-Service-Health-Check-Topic"
+    Properties:
+      TopicName: !Ref PlatinumSNSTopicID
 
-  ### Gold Topic
+  PlatinumSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !Ref PlatinumSubscriberEmail
+      Protocol: email
+      TopicArn: !Ref PlatinumSubscriptionTopic
 
-  GoldSnsTopic:
+  GoldSubscriptionTopic:
     Type: AWS::SNS::Topic
-    Properties: 
-      TopicName: "Gold-AWS-Service-Health-Check-Topic"
+    Properties:
+      TopicName: !Ref GoldSNSTopicID
 
-  ### Silver Topic
+  GoldSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !Ref GoldSubscriberEmail
+      Protocol: email
+      TopicArn: !Ref GoldSubscriptionTopic
 
-  SilverSnsTopic:
+  SilverSubscriptionTopic:
     Type: AWS::SNS::Topic
-    Properties: 
-      TopicName: "Silver-AWS-Service-Health-Check-Topic"
-
-
-  #############################################################
-
-  ##### SNS Subscribers #####
-
-
-
-
-  ### Platinum Topic
-
-PlatinumSubscription:
-  Type: AWS::SNS::Subscription
-  Properties:
-    Endpoint: test@example.com
-    Protocol: email
-    TopicArn: !Ref 'MySNSTopic'
-
-
-
-  ### Gold Topic
-
-
-  ### Silver Topic
+    Properties:
+      TopicName: !Ref SilverSNSTopicID
+    
+  SilverSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !Ref SilverSubscriberEmail
+      Protocol: email
+      TopicArn: !Ref SilverSubscriptionTopic
 
 
   #############################################################
 
   ##### DynamoDB State Tracking DB Setup #####
-
-
 
   AWSFailureEventsStateTable:
     Type: AWS::DynamoDB::Table
@@ -91,7 +130,7 @@ PlatinumSubscription:
           KeyType: "HASH"
         -
           AttributeName: "service"
-          KeyType: "HASH"
+          KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
@@ -100,11 +139,23 @@ PlatinumSubscription:
         - Key: "Purpose"
           Value: !Ref TagTablePurpose
     
-
   #############################################################
 
+  ##### Lambda Setup - Will add at later time #####
 
-
-
-
-  ##### Lambda Setup #####
+Outputs:
+  region:
+    Description: Region in which stack was deployed to and to be populated in Lambda config file
+    Value: !Ref "AWS::Region"
+  dynamodbTableName:
+    Description: DynamoDB table created to track state for service failures and value to be populated in config file
+    Value: !Ref AWSFailureEventsStateTable
+  platinumSnsArn:
+    Description: ARN of Platinum SNS Topic to be passed into Lambda Config File
+    Value: !Ref PlatinumSubscriptionTopic
+  goldSnsArn:
+    Description: ARN of Gold SNS Topic to be passed into Lambda Config File
+    Value: !Ref GoldSubscriptionTopic
+  silverSnsArn:
+    Description: ARN of Silver SNS Topic to be passed into Lambda Config File
+    Value: !Ref SilverSubscriptionTopic

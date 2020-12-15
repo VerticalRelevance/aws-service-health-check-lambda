@@ -4,8 +4,6 @@
 
 '''Return the status of specified AWS Services'''
 
-
-
 import logging
 import configparser
 
@@ -13,7 +11,7 @@ import json # for testing purposes only to read in test file
 
 import boto3
 
-# Setting up logging component of lamdba script
+# Setting up logging component of lambda script
 logging.basicConfig(level=logging.WARNING)
 
 # Creates up config parser object and imports the config file
@@ -75,7 +73,7 @@ def detect_service_failures():
     else:
         logging.info("There are AWS health events affecting your account")
 
-        # Creating a dictionary object that stores the differnet service level and failed serivce
+        # Creating a dictionary object that stores the different service level and failed service
         service_failure_dict = dict()
 
         # Creating a dictionary object that stores the full failure event inside
@@ -107,4 +105,4 @@ def detect_service_failures():
         return (service_failure_dict, event_failure_dict)
         
 
-detect_service_failures()
+#detect_service_failures()
