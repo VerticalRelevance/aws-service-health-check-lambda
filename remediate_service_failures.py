@@ -62,23 +62,23 @@ def remediate_SERVICE(event_failure_dictionary):
             # )
 
             # Inputs remediation action into DynamoDB for associated eventARN
-            update_item_response = dynamno_db_client.update_item(
-                    TableName=config['default']['dynamodb_table_name'],
-                    Key={
-                        'eventArn': {'S': event['arn']},
-                        'service': {'S': event['service']},
-                    },
-                    ReturnValues= 'ALL_NEW',
-                    ReturnConsumedCapacity='INDEXES',
-                    UpdateExpression='SET remediationActionStatus = :updatedRemediationActionStatus, remediationActionTimestamp = :updatedRemediationActionTimestamp',
-                    ConditionExpression = "remediationActionStatus = :remediationActionStatus",
-                    ## Conditional for status code = open and failureNotificationStatus and failureNotificationTimestamp
-                    ExpressionAttributeValues={
-                        ":remediationActionStatus": {'S': 'N/A'},
-                        ":updatedRemediationActionStatus": {'S': 'Triggered'},
-                        ":updatedRemediationActionTimestamp": {'S': str(time.time())},
-                    },
-            )
+            # update_item_response = dynamno_db_client.update_item(
+            #         TableName=config['default']['dynamodb_table_name'],
+            #         Key={
+            #             'eventArn': {'S': event['arn']},
+            #             'service': {'S': event['service']},
+            #         },
+            #         ReturnValues= 'ALL_NEW',
+            #         ReturnConsumedCapacity='INDEXES',
+            #         UpdateExpression='SET remediationActionStatus = :updatedRemediationActionStatus, remediationActionTimestamp = :updatedRemediationActionTimestamp',
+            #         ConditionExpression = "remediationActionStatus = :remediationActionStatus",
+            #         ## Conditional for status code = open and failureNotificationStatus and failureNotificationTimestamp
+            #         ExpressionAttributeValues={
+            #             ":remediationActionStatus": {'S': 'N/A'},
+            #             ":updatedRemediationActionStatus": {'S': 'Triggered'},
+            #             ":updatedRemediationActionTimestamp": {'S': str(time.time())},
+            #         },
+            # )
             
 
 

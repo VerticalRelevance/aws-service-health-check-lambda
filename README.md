@@ -1,9 +1,10 @@
 # aws-service-health-check-lambda
 
-### Readme In Progress
-
+This is a proof of concept tool to detect service / region level outages within an AWS environment. Refer to below as well as [Blog Post](https://www.verticalrelevance.com/insights/ "Blog Post") on this tool for more information.
                     
 ## Config File Generation
+Use [Config Generator](https://docs.google.com/spreadsheets/d/1cGOPU9G-8ST0rNFs01Kw756kQkpsyDA8NIpWcRFQXiw/edit?usp=sharing "Config Generator")
+
 ### Application Service Tiers
 
 #### Platinum Service
@@ -218,4 +219,3 @@ WorkMail | WORKMAIL
 WorkSpaces | WORKSPACES
 X-Ray | XRAY
 
-###End

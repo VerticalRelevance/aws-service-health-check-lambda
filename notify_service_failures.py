@@ -68,12 +68,9 @@ def write_service_failure_event(event_failure_dictionary):
                         "service": {"S": event_failure_dictionary[event]['service']}
                         },
                     )
-                #print(closed_response)
-                #print("resolutionNotificationStatus': {'S': 'Sent'}" not in closed_response)
                 if 'Item' in closed_response and "'resolutionNotificationStatus': {'S': 'Sent'}" not in str(closed_response['Item']):
                     event_closed(event_failure_dictionary[event])
 
-            ### NEED TO IMPROVE ERROR HANDLING HERE - TOO BROAD
         except botocore.exceptions.ClientError as e:
             pass
 

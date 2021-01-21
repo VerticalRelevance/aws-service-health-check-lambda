@@ -34,9 +34,9 @@ def get_service_level(service):
 # Detection Functionality
 
 
-#### FOR TESTING ONLY - READING IN FILE FOR SAMPLE EVENTS ####
-with open('test_health_events_payload.json') as f:
-  health_response = json.load(f)
+# #### FOR TESTING ONLY - READING IN FILE FOR SAMPLE EVENTS ####
+# with open('test_health_events_payload.json') as f:
+#   health_response = json.load(f)
 
 def detect_service_failures():
 
@@ -45,24 +45,15 @@ def detect_service_failures():
 
     # Get recent health events that are open for account lambda resides in
 
-####### PRODUCTION CODE SNIPIT BELOW #######
-    # health_response = health_client.describe_events(filter={
-    #     'regions': [
-    #         (config['default']['region']).strip('"')
-    #         ],
-    #     'eventStatusCodes': [
-    #         'open'
-    #     ],
-    #     }
-    # )
-
-####### NOT PRODUCTION - Pulls ALL Events, not just open events. Replace after testing ########
-    # health_response = health_client.describe_events(filter={
-    #     'regions': [
-    #         (config['default']['region']).strip('"')
-    #         ],
-    #     }
-    # )
+    health_response = health_client.describe_events(filter={
+        'regions': [
+            (config['default']['region']).strip('"')
+            ],
+        'eventStatusCodes': [
+            'open'
+        ],
+        }
+    )
 
     logging.info("Successfully checked for failed services")
 
@@ -99,10 +90,9 @@ def detect_service_failures():
 
                 logging.info("Successfully returned dictionary with failed services")
             except TypeError as NotCriticalService:
-                ## Add Info type to logger saying that Service X is not a critical service
                 pass
         # Returns failed items and events to a dict that can be passed into notify function
         return (service_failure_dict, event_failure_dict)
         
 
-#detect_service_failures()
+detect_service_failures()
