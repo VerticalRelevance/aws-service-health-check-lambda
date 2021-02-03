@@ -1,6 +1,6 @@
 # aws-service-health-check-lambda
 
-This is a proof of concept tool to detect service / region level outages within an AWS environment. Refer to below as well as [Blog Post](https://www.verticalrelevance.com/insights/ "Blog Post") on this tool for more information.
+This is a proof of concept tool to detect service / region level outages within an AWS environment. Refer to below as well as [Blog Post](https://www.verticalrelevance.com/automating-disaster-recovery-on-aws-for-financial-services/) on this tool for more information.
                     
 ## Config File Generation
 Use [Config Generator](https://docs.google.com/spreadsheets/d/1cGOPU9G-8ST0rNFs01Kw756kQkpsyDA8NIpWcRFQXiw/edit?usp=sharing "Config Generator")
